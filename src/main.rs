@@ -52,6 +52,23 @@ fn main() {
     call_fn(|| {
       println!("{}", x.0);
     });
+
+    // additional 1
+    // ok
+    let x = CopyableData(0);
+    call_fn_once(|| {
+      not_consume(x);
+    });
+    // ok
+    let x = CopyableData(0);
+    call_fn_mut(|| {
+      not_consume(x);
+    });
+    // ok
+    let x = CopyableData(0);
+    call_fn(|| {
+      not_consume(x);
+    });
 }
 
 // an example of closure
@@ -92,5 +109,13 @@ fn call_fn<F>(f: F) where F: Fn() {
 struct Data(i32);
 
 fn consume(x: Data) {
+   println!("{}", x.0);
+}
+
+#[derive(Clone, Copy)]
+struct CopyableData(i32);
+
+// Data が Copy を実装しているので, move ではなく copy される
+fn not_consume(x: CopyableData) {
    println!("{}", x.0);
 }
