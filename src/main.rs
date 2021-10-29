@@ -69,6 +69,32 @@ fn main() {
     call_fn(|| {
       not_consume(x);
     });
+
+    // additional 2
+    let x = Data(0);
+    let c = move || {
+      println!("in closure: {}", x.0);
+    };
+    // x はクロージャに move されるので,ここでは使えない.
+    // error : borrow of moved value: `x`
+    // println!("in main: {}", x.0);
+
+    c();
+
+    // move なしで, x の所有権も必要としないケース
+    // struct Closure {
+    //   x: &Data
+    // }
+
+    // move あり, もしくは x の所有権も必要とするケース
+    // struct Closure {
+    //   x: Data
+    // }
+
+    // * move クロージャかどうか
+    //    * 環境 => クロージャへの所有権の移転に関係
+    // * FnOnce, FnMut, Fn のいずれを実装しているか
+    //    * クロージャ => 外部の関数などへの所有権の移動に関係
 }
 
 // an example of closure
