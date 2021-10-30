@@ -95,6 +95,16 @@ fn main() {
     //    * 環境 => クロージャへの所有権の移転に関係
     // * FnOnce, FnMut, Fn のいずれを実装しているか
     //    * クロージャ => 外部の関数などへの所有権の移動に関係
+
+    let mut c = make_counter(5, 2);
+    println!("{}", c()); // 5
+    println!("{}", c()); // 7
+    println!("{}", c()); // 9
+
+    let mut c = make_counter_box(5, 2);
+    println!("{}", c()); // 5
+    println!("{}", c()); // 7
+    println!("{}", c()); // 9
 }
 
 // an example of closure
@@ -144,4 +154,20 @@ struct CopyableData(i32);
 // Data が Copy を実装しているので, move ではなく copy される
 fn not_consume(x: CopyableData) {
    println!("{}", x.0);
+}
+
+fn make_counter(init: i32, inc: i32) -> impl FnMut() -> i32 {
+   let mut x = init;
+   move || {
+        x += inc;
+        x - inc
+   }
+}
+
+fn make_counter_box(init: i32, inc: i32) -> Box<dyn FnMut() -> i32> {
+   let mut x = init;
+   Box::new(move || {
+        += inc;
+        x - inc
+   })
 }
