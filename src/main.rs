@@ -1,12 +1,12 @@
 fn main() {
     println!("Hello, world!");
-    call_with_42(|x| 2*x);
+    call_with_42(|x| 2 * x);
 
     // example 1
     // ok
     let x = Data(0);
     call_fn_once(|| {
-      consume(x);
+        consume(x);
     });
     // error : cannot move ut of `x`, a captured variable in an `FnMut` closure
     // let x = Data(0);
@@ -23,12 +23,12 @@ fn main() {
     // ok
     let mut x = Data(0);
     call_fn_once(|| {
-      x.0 = 1;
+        x.0 = 1;
     });
     // ok
     let mut x = Data(0);
     call_fn_mut(|| {
-      x.0 = 1;
+        x.0 = 1;
     });
     // error : cannot assign to `x.0` as `Fn` closures cannot mutate their captured variables
     // let mut x = Data(0);
@@ -40,40 +40,40 @@ fn main() {
     // ok
     let x = Data(0);
     call_fn_once(|| {
-      println!("{}", x.0);
+        println!("{}", x.0);
     });
     // ok
     let x = Data(0);
     call_fn_mut(|| {
-      println!("{}", x.0);
+        println!("{}", x.0);
     });
     // ok
     let x = Data(0);
     call_fn(|| {
-      println!("{}", x.0);
+        println!("{}", x.0);
     });
 
     // additional 1
     // ok
     let x = CopyableData(0);
     call_fn_once(|| {
-      not_consume(x);
+        not_consume(x);
     });
     // ok
     let x = CopyableData(0);
     call_fn_mut(|| {
-      not_consume(x);
+        not_consume(x);
     });
     // ok
     let x = CopyableData(0);
     call_fn(|| {
-      not_consume(x);
+        not_consume(x);
     });
 
     // additional 2
     let x = Data(0);
     let c = move || {
-      println!("in closure: {}", x.0);
+        println!("in closure: {}", x.0);
     };
     // x はクロージャに move されるので,ここでは使えない.
     // error : borrow of moved value: `x`
@@ -108,8 +108,11 @@ fn main() {
 }
 
 // an example of closure
-fn call_with_42<F>(f: F) where F: FnOnce(i32) -> i32 {
-   println!("f(42) = {}", f(42))
+fn call_with_42<F>(f: F)
+where
+    F: FnOnce(i32) -> i32,
+{
+    println!("f(42) = {}", f(42))
 }
 
 /*
@@ -130,22 +133,31 @@ pub trait Fn<Args> : FnMut<Args> {
 }
 */
 
-fn call_fn_once<F>(f: F) where F: FnOnce() {
-   f();
+fn call_fn_once<F>(f: F)
+where
+    F: FnOnce(),
+{
+    f();
 }
 
-fn call_fn_mut<F>(mut f: F) where F: FnMut() {
-   f();
+fn call_fn_mut<F>(mut f: F)
+where
+    F: FnMut(),
+{
+    f();
 }
 
-fn call_fn<F>(f: F) where F: Fn() {
-   f();
+fn call_fn<F>(f: F)
+where
+    F: Fn(),
+{
+    f();
 }
 
 struct Data(i32);
 
 fn consume(x: Data) {
-   println!("{}", x.0);
+    println!("{}", x.0);
 }
 
 #[derive(Clone, Copy)]
@@ -153,21 +165,21 @@ struct CopyableData(i32);
 
 // Data が Copy を実装しているので, move ではなく copy される
 fn not_consume(x: CopyableData) {
-   println!("{}", x.0);
+    println!("{}", x.0);
 }
 
 fn make_counter(init: i32, inc: i32) -> impl FnMut() -> i32 {
-   let mut x = init;
-   move || {
+    let mut x = init;
+    move || {
         x += inc;
         x - inc
-   }
+    }
 }
 
 fn make_counter_box(init: i32, inc: i32) -> Box<dyn FnMut() -> i32> {
-   let mut x = init;
-   Box::new(move || {
-        += inc;
+    let mut x = init;
+    Box::new(move || {
+        x += inc;
         x - inc
-   })
+    })
 }
